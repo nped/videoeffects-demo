@@ -2,7 +2,7 @@
 
 videoeffects-demo is a silly little demo for real-time videoeffects. It currently supports an image, a video or a webcam feed as input and can apply a chain of effects.
 
-A demo can be found on *http://nped.se/videoeffects-demo/*
+A demo can be found on http://nped.se/videoeffects-demo/
 
 It should work in Firefox and Chrome. A developer release of Chrome is required for the webcam to work, see [webRTC](http://www.webrtc.org/running-the-demos).
 
