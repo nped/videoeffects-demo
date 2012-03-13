@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>videoeffects-demo | HTML5 Video, WebGL and WebRTC</title>
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+<body>
+
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span3">
+        <div class="well" align="center" id="controller">
+          <div id="inputs" align="center">
+            <h1>Inputs</h1>
+            <button class="btn" onClick="changeInput('image');">Image</button>
+            <button class="btn" onClick="changeInput('webcam');">Webcam</button>
+            <button class="btn" onClick="changeInput('video');">Video</button><br />
+            Image and video is from <a href="http://www.sintel.org/">Sintel</a><br />
+            Webcam requires Chrome with <a href="http://www.webrtc.org/">WebRTC</a><br />
+            <button id="inputToggle" class="rounded btn" align="center" onClick="toggleInputBlock();">Hide the input</button>
+          </div>
+          
+          <div class="delimiter">
+          </div>
+            
+          <h1>WebGL effects</h1>
+          (Powered by <a href="http://seriouslyjs.org/">Seriously.js</a>)
+          <div id="effects">
+            <button class="effect rounded btn">edge</button>
+            <button class="effect rounded btn">sepia</button>
+            <button class="effect rounded btn">bleach-bypass</button>
+            <button class="effect rounded btn">colorcube</button>
+            <button class="effect rounded btn">invert</button>
+            <button class="effect rounded btn">lumakey</button>
+            <button class="effect rounded btn">nightvision</button>
+            <button class="effect rounded btn">ripple</button>
+            <button class="effect rounded btn">scanlines</button>
+            <button class="effect rounded btn">tone</button>
+            <button class="effect rounded btn">vignette</button>
+          </div>
+          
+          <div class="delimiter">
+          </div>
+          
+          <h1>CSS transforms</h1>
+          <div class="transforms">
+            Coming soon! :)
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="span9">
+        <div id="inputBlock" class="block rounded" align="center">
+          <img id="input" src="img/sintel.jpg"></img>
+        </div>
+        
+        <div id="outputBlock" class="block rounded" align="center">
+          <canvas id="output" width="704px" height="396px"></canvas>
+        </div>
+      </div>
+    </div>  
+  </div>
+      
+  <script src="seriously.js"></script>
+  <script src="effects/seriously.sepia.js"></script>
+  <script src="effects/seriously.edge.js"></script>
+  <script src="effects/seriously.bleach-bypass.js"></script>
+  <script src="effects/seriously.colorcube.js"></script>
+  <script src="effects/seriously.invert.js"></script>
+  <script src="effects/seriously.lumakey.js"></script>
+  <script src="effects/seriously.nightvision.js"></script>
+  <script src="effects/seriously.ripple.js"></script>
+  <script src="effects/seriously.scanlines.js"></script>
+  <script src="effects/seriously.tone.js"></script>
+  <script src="effects/seriously.vignette.js"></script>
+  <script>
+
+    /* Start of webRTC stuff */
+    var localVideo;
+
+    initializeWebRTC = function() {
+      localVideo = document.getElementById("input");
+      getUserMedia();
+    }
+
+    getUserMedia = function() {
+      try { navigator.webkitGetUserMedia("video", onGotStream, onFailedStream);
+      } catch (e) {
+        console.log("getUserMedia error " + e);
+      }
+    }
+
+    onGotStream = function(stream) {
+      localVideo.src = webkitURL.createObjectURL(stream);
+    }
+
+    onFailedStream = function(error) {
+      console.log("Failed to get access to local media. Error code was " + error.code + ".");
+    }
+    /* End of webRTC stuff */
+
+    function changeInput(input) {
+      var inputBlock = document.getElementById('inputBlock');
+      if(input === 'image') {
+          inputBlock.innerHTML = '<img id="input" src="img/sintel.jpg"></img>';
+      } else if(input === 'webcam') {
+          inputBlock.innerHTML = '<video id="input" autoplay="autoplay"></video>';
+          initializeWebRTC();
+      } else if(input === 'video') {
+          inputBlock.innerHTML = '<video id="input" autoplay="autoplay" loop="loop" muted="true">' + 
+            '<source src="video/sintel_trailer.webm" type="video/webm">' +
+            '<source src="video/sintel_trailer.mp4" type="video/mp4">' + 
+            '<source src="video/sintel_trailer.ogv" type="video/ogg">' + 
+            '</video>';
+      }
+      updateEffects();
+    }
+    
+    function toggleInputBlock() {
+      var inputBlock = document.getElementById('inputBlock');
+      var inputToggle = document.getElementById('inputToggle');
+      
+      if(inputBlock.style.display != 'none') {
+        inputBlock.style.display = 'none';
+        inputToggle.innerHTML = 'Show the input';
+      } else {
+        inputBlock.style.display = 'block';
+        inputToggle.innerHTML = 'Hide the input';
+      }
+    }
+
+    function toggleEffect() {
+        var effectID = this.innerHTML;
+        var removed = false;
+        
+        for(var i = 0; i < activeEffects.length; i++) {
+            if(activeEffects[i] === effectID) {
+                activeEffects.splice(i, 1);
+                removed = true;
+                break;
+            }
+        }
+        
+        if(!removed) {
+          activeEffects.push(effectID);
+          this.classList.add('active');
+        } else {
+          this.classList.remove('active');
+        }
+        
+        updateEffects();
+    }
+
+    function updateEffects() {
+      if(seriously) {
+          seriously.stop();
+      }
+      
+      seriously = new Seriously();
+      var input = seriously.source('#input');
+      var target = seriously.target('#output');
+      var effects = [];
+      
+      for(var i = 0; i < activeEffects.length; i++) {
+          effects.push(seriously.effect(activeEffects[i]));
+          if(i === 0) {
+              effects[i].source = input;
+          } else {
+              effects[i].source = effects[i-1];
+          }
+      }
+      
+      if(effects.length > 0) {
+        target.source = effects[effects.length-1];
+      } else {
+        target.source = input;
+      }
+
+      seriously.go();
+    }
+
+    var seriously;
+    var activeEffects = [];
+    
+    var effects = document.querySelectorAll('#effects .effect');
+
+    [].forEach.call(effects, function(effect) {
+      effect.addEventListener('click', toggleEffect, false);
+    });
+    
+    updateEffects();
+
+  </script>
+
+</body>
+</html>
