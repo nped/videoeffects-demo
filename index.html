@@ -89,7 +89,7 @@
     }
 
     getUserMedia = function() {
-      try { navigator.webkitGetUserMedia("video", onGotStream, onFailedStream);
+      try { navigator.webkitGetUserMedia({video:true}, onGotStream, onFailedStream);
       } catch (e) {
         console.log("getUserMedia error " + e);
       }
