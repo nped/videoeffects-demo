@@ -19,7 +19,7 @@
             <button class="btn" onClick="changeInput('video');">Video</button><br />
             Image and video comes from <a href="http://www.sintel.org/">Sintel</a><br />
             Webcam requires Chrome with <a href="http://www.webrtc.org/">WebRTC</a><br />
-            <button id="inputToggle" class="rounded btn" align="center" onClick="toggleInputBlock();">Hide the input</button>
+            <button id="inputToggle" class="rounded btn" align="center" onClick="toggleInputBlock();">Show the input source</button>
           </div>
           
           <div class="delimiter">
@@ -53,7 +53,7 @@
       </div>
 
       <div class="span9">
-        <div id="inputBlock" class="block rounded" align="center">
+        <div id="inputBlock" class="block rounded" align="center" style="display:none">
           <img id="input" src="img/sintel.jpg"></img>
         </div>
         
@@ -64,7 +64,7 @@
     </div>  
   </div>
       
-  <a href="https://github.com/nped/videoeffects-demo"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub"></a>      
+  <a href="https://github.com/nped/videoeffects-demo"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>      
       
   <script src="seriously.js"></script>
   <script src="effects/seriously.sepia.js"></script>
@@ -133,10 +133,10 @@
       
       if(inputBlock.style.display != 'none') {
         inputBlock.style.display = 'none';
-        inputToggle.innerHTML = 'Show the input';
+        inputToggle.innerHTML = 'Show the input source';
       } else {
         inputBlock.style.display = 'block';
-        inputToggle.innerHTML = 'Hide the input';
+        inputToggle.innerHTML = 'Hide the input source';
       }
     }
 
